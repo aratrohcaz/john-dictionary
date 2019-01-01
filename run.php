@@ -14,6 +14,11 @@ $config_max_num = 3000;
 $do_rainbow_case = true; // this will make a lot more entries depending on word length
 $do_rot13 = true;
 
+$symbols = [
+  '!',
+  '@',
+];
+
 /**
  * Example:
  * $work = 'Test', $min = 0, $max = 5;
@@ -88,7 +93,7 @@ $lines_written = 0;
 $start = time();
 
 foreach ($words as $word) {
-  printf("Writing %s \r", $word);
+  printf("Writing %-40s \r", $word);
 
   $out_lines = 0;
   // in original format
@@ -122,11 +127,17 @@ foreach ($words as $word) {
     $out_lines += 3;
 
     // special
+    foreach ($symbols as $symbol) {
+      fwrite($out_handle, $counter . $word . $symbol . PHP_EOL);
+      fwrite($out_handle, $counter . ucwords($word) . $symbol . PHP_EOL);
+      fwrite($out_handle, $counter . strtoupper($word) . $symbol . PHP_EOL);
+      $out_lines += 3;
+    }
     fwrite($out_handle, $counter . $word . '34' . PHP_EOL);
     fwrite($out_handle, $counter . $word . '34!' . PHP_EOL);
     fwrite($out_handle, $counter . $word . '18' . PHP_EOL);
     fwrite($out_handle, $counter . $word . '18!' . PHP_EOL);
-    $out_lines++;
+    $out_lines += 4;
 
     $counter++;
   }
@@ -138,7 +149,7 @@ if ($do_rainbow_case) {
   lg('Outputting Rainbow Words');
   $start = time();
   foreach ($rainbow_words as $rainbow_word) {
-    printf("Writing %s \r", $rainbow_word);
+    printf("Writing %-40s \r", $rainbow_word);
 
     $out_lines = 0;
     $counter = $config_min_num;
@@ -155,6 +166,13 @@ if ($do_rainbow_case) {
       $out_lines += 3;
 
       // special
+      foreach ($symbols as $symbol) {
+        fwrite($out_handle, $counter . $word . $symbol . PHP_EOL);
+        fwrite($out_handle, $counter . ucwords($word) . $symbol . PHP_EOL);
+        fwrite($out_handle, $counter . strtoupper($word) . $symbol . PHP_EOL);
+        $out_lines += 3;
+      }
+
       fwrite($out_handle, $counter . $rainbow_word . '34' . PHP_EOL);
       $out_lines++;
 
@@ -173,7 +191,7 @@ $shell_file = [
   sprintf('#john --wordlist=./dictionaries/%s --format=nt-opencl passwords.dump', $dict_file_name),
 ];
 
-file_put_contents(ROOT. DIRECTORY_SEPARATOR . 'rip.sh', implode(PHP_EOL, $shell_file));
+file_put_contents(ROOT . DIRECTORY_SEPARATOR . 'rip.sh', implode(PHP_EOL, $shell_file));
 
 // 4. Profit!
 lg(sprintf('Wrote a dictionary of ~%d words in %d seconds', $lines_written, time() - $g_start));
