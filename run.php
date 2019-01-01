@@ -123,6 +123,9 @@ foreach ($words as $word) {
 
     // special
     fwrite($out_handle, $counter . $word . '34' . PHP_EOL);
+    fwrite($out_handle, $counter . $word . '34!' . PHP_EOL);
+    fwrite($out_handle, $counter . $word . '18' . PHP_EOL);
+    fwrite($out_handle, $counter . $word . '18!' . PHP_EOL);
     $out_lines++;
 
     $counter++;
@@ -163,8 +166,17 @@ if ($do_rainbow_case) {
 }
 
 fclose($out_handle);
+
+$shell_file = [
+  '#!/usr/bin/env bash',
+  sprintf('john --wordlist=./dictionaries/%s --format=nt2 passwords.dump', $dict_file_name),
+  sprintf('#john --wordlist=./dictionaries/%s --format=nt-opencl passwords.dump', $dict_file_name),
+];
+
+file_put_contents(ROOT. DIRECTORY_SEPARATOR . 'rip.sh', implode(PHP_EOL, $shell_file));
+
 // 4. Profit!
-lg(sprintf('Wrote a dictionary of ~%d words in %d seconds', $lines_written , time() - $g_start));
+lg(sprintf('Wrote a dictionary of ~%d words in %d seconds', $lines_written, time() - $g_start));
 
 function lg($message, $with_eol = true)
 {
