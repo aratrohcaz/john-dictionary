@@ -1,4 +1,6 @@
-
+dictionaries/*
+input/*
+debug_list.txt
 # Created by https://www.gitignore.io/api/phpstorm,osx
 # Edit at https://www.gitignore.io/?templates=phpstorm,osx
 
