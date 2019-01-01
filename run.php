@@ -5,11 +5,11 @@
  * Date: 1/1/19
  * Time: 9:41 PM
  */
-
+$g_start = time();
 define('ROOT', __DIR__);
 
 $config_min_num = 0;
-$config_max_num = 2020;
+$config_max_num = 3000;
 
 $do_rainbow_case = true; // this will make a lot more entries depending on word length
 $do_rot13 = true;
@@ -21,7 +21,6 @@ $do_rot13 = true;
  * 'test', 'test0', '0test', '0test0', '0TEST', '0Test', '0tEst'... '0teSt0'... '0tesT0'
  * 'test', 'test1', '1test', '1test1', '1TEST', '1Test', '1tEst'... '1teSt1'... '1tesT1'
  */
-
 
 // 0. Setup Directories
 $input_dir = ROOT . DIRECTORY_SEPARATOR . 'input';
@@ -85,7 +84,12 @@ $dict_file_name = date('Ymd_His') . '-custom.dict';
 lg('Writing to dictionary file > ' . $dict_file_name);
 $out_handle = fopen($dict_dir . DIRECTORY_SEPARATOR . $dict_file_name, 'wb');
 $lines_written = 0;
+
+$start = time();
+
 foreach ($words as $word) {
+  printf("Writing %s \r", $word);
+
   $out_lines = 0;
   // in original format
   fwrite($out_handle, $word . PHP_EOL);
@@ -125,8 +129,14 @@ foreach ($words as $word) {
   }
   $lines_written += $out_lines;
 }
+lg(sprintf('Done, base list took %d seconds', time() - $start));
+
 if ($do_rainbow_case) {
+  lg('Outputting Rainbow Words');
+  $start = time();
   foreach ($rainbow_words as $rainbow_word) {
+    printf("Writing %s \r", $rainbow_word);
+
     $out_lines = 0;
     $counter = $config_min_num;
 
@@ -147,14 +157,14 @@ if ($do_rainbow_case) {
 
       $counter++;
     }
-
     $lines_written += $out_lines;
   }
+  lg(sprintf('Done, Rainbow list took %d seconds', time() - $start));
 }
 
 fclose($out_handle);
 // 4. Profit!
-lg('Wrote a dictionary of ~' . $lines_written . ' words');
+lg(sprintf('Wrote a dictionary of ~%d words in %d seconds', $lines_written , time() - $g_start));
 
 function lg($message, $with_eol = true)
 {
